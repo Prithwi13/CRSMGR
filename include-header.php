@@ -2,25 +2,23 @@
 require_once './session-logged-in.php';
 require_once './utils.php';
 
-function breadCrumbs($pageName = 'Dashboard')
+function breadCrumbs($pageName = 'Dashboard', $icon = '<i class="fa fa-dashboard"></i>')
 {
     $currentName = $pageName != 'Dashboard' ? '<li><a href="#">' . $pageName . '</a></li>' : '';
     echo '<div class="page-title">
-    <div>
-        <h1><i class="fa fa-dashboard"></i> ' . $pageName . '</h1>
-    </div>
-    <div>
-        <ul class="breadcrumb">
-            <li><i class="fa fa-home fa-lg"></i></li>
-            <li><a href="index.php">Dashboard</a></li>
-            ' . $currentName . '
-        </ul>
-    </div>
-</div>';
+        <div>
+            <h1>' . $icon . ' ' . $pageName . '</h1>
+        </div>
+        <div>
+            <ul class="breadcrumb">
+                <li><i class="fa fa-home fa-lg"></i></li>
+                <li><a href="index.php">Dashboard</a></li>
+                ' . $currentName . '
+            </ul>
+        </div>
+    </div>';
     return $pageName;
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -46,7 +44,7 @@ function breadCrumbs($pageName = 'Dashboard')
 <body class="sidebar-mini fixed">
     <div class="wrapper">
         <!-- Navbar-->
-        <header class="main-header hidden-print"><a class="logo" href="index.html">Course Management</a>
+        <header class="main-header hidden-print"><a class="logo" href="system-dashboard.php">Course Management</a>
             <nav class="navbar navbar-static-top">
                 <!-- Sidebar toggle button--><a class="sidebar-toggle" href="#" data-toggle="offcanvas"></a>
                 <!-- Navbar Right Menu-->
@@ -69,7 +67,7 @@ function breadCrumbs($pageName = 'Dashboard')
             <section class="sidebar">
                 <div class="user-panel">
                     <div class="pull-left image">
-                        <img class="img-circle" src="<?= getHttpAddressBarValues('baseUrl'); ?>/images/user.png" alt="User Image">
+                        <img class="img-circle" src="./images//user.png" alt="User Image">
                     </div>
                     <div class="pull-left info">
                         <p><?= $_SESSION['firstName']; ?></p>
@@ -77,7 +75,7 @@ function breadCrumbs($pageName = 'Dashboard')
                     </div>
                 </div>
                 <!-- Sidebar Menu-->
-                <?php $currentPageName = getHttpAddressBarValues('fileName'); ?>
+
                 <ul class="sidebar-menu">
                     <li <?= getLinkActiveClass(DASHBOARD) ?>><a href="system-dashboard.php"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
 
@@ -92,13 +90,22 @@ function breadCrumbs($pageName = 'Dashboard')
                     <?php if ($_SESSION['type'] == INSTRUCTOR) : ?>
                         <!-- Instructor Pages -->
                         <li <?= getLinkActiveClass(INSTRUCTOR_UPLOAD_CSV); ?>><a href="instructor-upload-csv.php"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Upload CSV</span></a></li>
-                        <li <?= getLinkActiveClass(INSTRUCTOR_CURRENT_COURSE_STUDENTS) ?>><a href="instructor-current-course-students.php"><i class="fa fa-address-card" aria-hidden="true"></i><span></span>All Students</a></li>
+                        <li <?= getLinkActiveClass(INSTRUCTOR_CURRENT_COURSE_STUDENTS) ?>><a href="instructor-current-course-students.php"><i class="fa fa-address-card" aria-hidden="true"></i><span>All Students</span></a></li>
+                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_STUDENT_GROUPS) ?>><a href="instructor-add-assignment.php"><i class="fa fa-file" aria-hidden="true"></i><span>Add Assignment</span></a></li>
+                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_STUDENT_GROUPS) ?>><a href="instructor-add-lecture-notes.php"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Add Lecture Notes</span></a></li>
+                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_STUDENT_GROUPS) ?>><a href="instructor-add-student-groups.php"><i class="fa fa-users" aria-hidden="true"></i><span>Create Student Groups</span></a></li>
                         <!-- End of Instructor Pages -->
                     <?php endif; ?>
-                    <li><a href="charts.html"><i class="fa fa-pie-chart"></i><span>Link</span></a></li>
-                    <li><a href="charts.html"><i class="fa fa-pie-chart"></i><span>Link</span></a></li>
-                    <li><a href="charts.html"><i class="fa fa-pie-chart"></i><span>Link</span></a></li>
-                    <li><a href="charts.html"><i class="fa fa-pie-chart"></i><span>Link</span></a></li>
+
+                    <?php if ((int)$_SESSION['type'] !== ADMIN) : ?>
+                        <!-- Common Pages but not for admin -->
+                        <li <?= getLinkActiveClass(SYSTEM_MESSAGE) ?>><a href="system-message.php"><i class="fa fa-comments" aria-hidden="true"></i><span>Messages</span></a></li>
+                        <!-- End of common Pages but not for admin -->
+                    <?php endif; ?>
+
+                    <!-- Common Pages for all users -->
+                    <li <?= getLinkActiveClass(SYSTEM_FAQ) ?>><a href="system-faq.php"><i class="fa fa-list-alt" aria-hidden="true"></i><span>FAQ</span></a></li>
+                    <!-- End common Pages for all users -->
                 </ul>
             </section>
         </aside>

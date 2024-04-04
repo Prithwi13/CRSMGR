@@ -5,7 +5,7 @@ $LoggedIn = $_SESSION['userId'];
 if ($_SESSION['type'] != INSTRUCTOR) {
     header('location:system-dashboard.php');
 }
-$pageName = breadCrumbs('Current Course Students');
+$pageName = breadCrumbs('Current Course Students', '<i class="fa fa-address-card" aria-hidden="true"></i>');
 $status = ACTIVE;
 
 $getActiveCourse = $db->getSingleRecord("SELECT c.*, ct.term_name FROM course as c INNER JOIN course_term as ct ON ct.id=c.term  WHERE c.status=$status ORDER BY c.created_dt DESC");
@@ -103,6 +103,6 @@ if (count($getActiveCourse) === 0) :
 
 <?php
 
-    require_once './include-footer.php';
 endif;
+require_once './include-footer.php';
 ?>

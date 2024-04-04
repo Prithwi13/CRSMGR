@@ -1,4 +1,7 @@
 <?php
+// Header issue fixed
+ob_start();
+
 // all User types
 define('ADMIN', 1);
 define('MARKER', 2);
@@ -15,6 +18,9 @@ define('ADD_USERS', 'admin-add-users');
 define('ADD_COURSE', 'admin-add-course');
 define('INSTRUCTOR_UPLOAD_CSV', 'instructor-upload-csv');
 define('INSTRUCTOR_CURRENT_COURSE_STUDENTS', 'instructor-current-course-students');
+define('INSTRUCTOR_ADD_STUDENT_GROUPS', 'instructor-add-student-groups');
+define('SYSTEM_MESSAGE', 'system-message');
+define('SYSTEM_FAQ', 'system-faq');
 
 function getCurrentTime(): string
 {
@@ -30,25 +36,11 @@ function getPostValues(): void
     print_r($_POST);
     exit;
 }
-
-function getHttpAddressBarValues(string $type = 'baseUrl'): string
-{
-    $baseUrl = '//' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']);
-    $url = basename($_SERVER['REQUEST_URI'], '?' . $_SERVER['QUERY_STRING']);
-    $fileName = pathinfo($url, PATHINFO_FILENAME); //file name without extension
-
-    if ($type == 'baseUrl') {
-        return $baseUrl;
-    } else if ($type == 'fileName') {
-        return $fileName;
-    } else {
-        die('Sending wrong values in getHttpAddressBarValues function');
-    }
-}
-
 function getLinkActiveClass(string $fileName = DASHBOARD)
 {
-    return $fileName == getHttpAddressBarValues('fileName') ?  'class="active"' : '';
+    $url = basename($_SERVER['REQUEST_URI'], '?' . $_SERVER['QUERY_STRING']);
+    $addressBarFileName =  pathinfo($url, PATHINFO_FILENAME); //file name without extension
+    return $fileName == $addressBarFileName ?  'class="active"' : '';
 }
 
 function getSelectOption(string $optionValue = '', string $databaseValue = ''): string
@@ -59,4 +51,11 @@ function getSelectOption(string $optionValue = '', string $databaseValue = ''): 
 function getActiveOrInactive(string $dataBaseValue = ''): string
 {
     return $dataBaseValue ? 'Active' : 'Inactive';
+}
+
+function redirect(string $fileName = '', string $message = ''): void
+{
+    $fileName  = $message ? $fileName . '?' . $message : $fileName;
+    header("location: $fileName");
+    exit;
 }

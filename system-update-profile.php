@@ -12,11 +12,11 @@ if (isset($_POST['update'])) {
     if ($check) {
         $_SESSION['firstName'] = $firstName;
         $_SESSION['lastName'] = $lastName;
-        $_SESSION['email'] = $email;
+        $_SESSION['email'] = $emailId;
 
-        header('location:update-profile.php?status=success&message=' . urlencode('Profile Updated Successfully'));
+        header('location:system-update-profile.php?status=success&message=' . urlencode('Profile Updated Successfully'));
     } else {
-        header('location:update-profile.php?status=danger&message=' . urlencode('Database Problem'));
+        header('location:system-update-profile.php?status=danger&message=' . urlencode('Database Problem'));
     }
 }
 

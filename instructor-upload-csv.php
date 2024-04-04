@@ -1,7 +1,9 @@
 <?php
 require_once './include-header.php';
 include_once './_db.php';
-$getData = $db->getSingleRecord("SELECT c.*, ct.term_name FROM course as c INNER JOIN course_term as ct ON ct.id=c.term  WHERE c.status=1 ORDER BY c.created_dt DESC");
+
+$activeStatus = ACTIVE;
+$getData = $db->getSingleRecord("SELECT c.*, ct.term_name FROM course as c INNER JOIN course_term as ct ON ct.id=c.term  WHERE c.status=$activeStatus ORDER BY c.created_dt DESC");
 
 if ($_SESSION['type'] != INSTRUCTOR) {
     header('location:system-dashboard.php');
@@ -134,7 +136,7 @@ if (isset($_POST["upload"])) {
     }
 }
 
-$pageName = breadCrumbs('Upload CSV');
+$pageName = breadCrumbs('Upload CSV', '<i class="fa fa-file-text-o" aria-hidden="true"></i>');
 
 if (count($getData) === 0) :
 
