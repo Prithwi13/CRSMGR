@@ -3,58 +3,53 @@ require_once './include-header.php';
 include_once './_db.php';
 $LoggedIn = $_SESSION['userId'];
 if ($_SESSION['type'] != ADMIN) {
-    header('location:system-dashboard.php');
+    redirect('system-dashboard.php');
 }
 
-if (isset($_GET['edit-id'])) {
-    $userEditId = $_GET['edit-id'];
+if (isset($_POST['updateId'])) {
+    $userEditId = base64_decode($_POST['updateId']);
+    $category = $_POST['category'];
+    $firstName = htmlentities($_POST['firstName']);
+    $lastName = htmlentities($_POST['lastName']);
+    $emailId = htmlentities($_POST['emailId']);
+    $currentTime = getCurrentTime();
+    $check = $db->updateData("UPDATE users SET type='$category', first_name='$firstName', last_name='$lastName', email_id='$emailId',modified_by='$LoggedIn', modified_dt='$currentTime' WHERE user_id='$userEditId'");
+    if ($check) {
+        redirect('admin-add-users.php', 'status=success&message=' . urlencode('User updated successfully'));
+    } else {
+        redirect('admin-add-users.php', 'status=danger&message=' . urlencode('Database Problem'));
+    }
+} elseif (isset($_GET['edit-id'])) {
+    $userEditId = base64_decode($_GET['edit-id']);
     $userData = $db->getSingleRecord("SELECT type, first_name, last_name, email_id FROM users where user_id=$userEditId");
     $category = $userData['type'];
     $firstName = $userData['first_name'];
     $lastName = $userData['last_name'];
     $emailId = $userData['email_id'];
-}
+} else if (isset($_POST['create'])) {
 
-if (isset($_POST['create'])) {
     $category = $_POST['category'];
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $emailId = $_POST['emailId'];
+    $firstName = htmlentities($_POST['firstName']);
+    $lastName = htmlentities($_POST['lastName']);
+    $emailId = htmlentities($_POST['emailId']);
     $password = password_hash('123456', PASSWORD_DEFAULT);
-    $status = 1;
+    $status = ACTIVE;
     // $password = substr(md5($emailId), 0, 8);
     $currentTime = getCurrentTime();
-
     $result = $db->getSingleRecord("SELECT email_id FROM users where email_id='$emailId'");
     if (count($result) === 0) {
         $sql = "INSERT INTO users(type, first_name, last_name, email_id, password, status, created_by, created_dt) VALUES ('$category','$firstName','$lastName','$emailId','$password', $status, '$LoggedIn', '$currentTime')";
-
         $check = $db->insertData($sql);
         if ($check > 0) {
-            header('location:admin-add-users.php?status=success&message=' . urlencode('User created successfully'));
+            redirect('admin-add-users.php', 'status=success&message=' . urlencode('User created successfully'));
         } else {
-            header('location:admin-add-users.php?status=danger&message=' . urlencode('Database Problem'));
+            redirect('admin-add-users.php', 'status=danger&message=' . urlencode('Database Problem'));
         }
     } else {
-        header('location:admin-add-users.php?status=danger&message=' . urlencode('User already exist'));
-    }
-} else if (isset($_POST['update'])) {
-    $userEditId = $_POST['updateId'];
-    $category = $_POST['category'];
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $emailId = $_POST['emailId'];
-    $currentTime = getCurrentTime();
-    $check = $db->updateData("UPDATE users SET type='$category', first_name='$firstName', last_name='$lastName', email_id='$emailId',modified_by='$LoggedIn', modified_dt='$currentTime' WHERE user_id='$userEditId'");
-
-    if ($check) {
-        header('location:admin-add-users.php?status=success&message=' . urlencode('User updated successfully'));
-    } else {
-        header('location:admin-add-users.php?status=danger&message=' . urlencode('Database Problem'));
+        redirect('admin-add-users.php', 'status=danger&message=' . urlencode('User already exist'));
     }
 }
-
-$pageName = breadCrumbs('Add Users');
+$pageName = breadCrumbs('Add Users', '<i class="fa fa-user-o" aria-hidden="true"></i>');
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -64,7 +59,7 @@ $pageName = breadCrumbs('Add Users');
                 <div class="col-lg-6 col-lg-offset-2">
                     <?php require_once './include-message.php'; ?>
                     <div class="well bs-component">
-                        <form class="form-horizontal" action="" method="post">
+                        <form class="form-horizontal" action="<?= $_SERVER['PHP_SELF']; ?>" method="post">
                             <div class="form-group">
                                 <label class="col-lg-4 control-label" for="category">Role</label>
                                 <div class="col-lg-8">
@@ -98,20 +93,19 @@ $pageName = breadCrumbs('Add Users');
                             <div class="form-group">
                                 <label class="col-lg-4 control-label" for="email-id">Email Id</label>
                                 <div class="col-lg-8">
-                                    <input class="form-control" name="emailId" id="email-id" type="text" placeholder="Enter Email Id" required value="<?= $emailId ?? '' ?>" />
+                                    <input class="form-control" name="emailId" id="email-id" type="email" placeholder="Enter Email Id" required value="<?= $emailId ?? '' ?>" />
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <div class="col-lg-8 col-lg-offset-4">
                                     <?php if (isset($userEditId)) : ?>
-                                        <input type="hidden" name="updateId" value="<?= $userEditId ?>">
+                                        <input type="hidden" name="updateId" value="<?= base64_encode($userEditId) ?>">
                                         <button class="btn btn-success" name="update" type="submit">Update</button>
                                     <?php else : ?>
                                         <button class="btn btn-success" name="create" type="submit">Create</button>
+                                        <button class="btn btn-danger" type="reset">Clear</button>
                                     <?php endif; ?>
-
-                                    <button class="btn btn-danger" type="reset">Cancel</button>
                                 </div>
                             </div>
                         </form>
@@ -147,7 +141,7 @@ $pageName = breadCrumbs('Add Users');
                                         <td><?= $value['email_id'] ?></td>
                                         <td><?= $value['created_dt'] ?></td>
                                         <td><?= $value['modified_dt'] ?? 'N/A'; ?></td>
-                                        <td><a class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to edit <?= $value['email_id'] ?> ?')" href="admin-add-users.php?edit-id=<?= $value['user_id'] ?>">Edit</a></td>
+                                        <td><a class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to edit <?= $value['email_id'] ?> ?')" href="admin-add-users.php?edit-id=<?= base64_encode($value['user_id']) ?>">Edit</a></td>
                                     </tr>
                                 <?php
                                 endforeach;

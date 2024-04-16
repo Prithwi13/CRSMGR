@@ -22,7 +22,8 @@ if (isset($_POST['signIn'])) {
     'type' => $row['type'],
     'firstName' => $row['first_name'],
     'lastName' => $row['last_name'],
-    'emailId' => $row['email_id']
+    'emailId' => $row['email_id'],
+    'studentId' => $row['student_id'] ?? 0
   );
   header('location:system-dashboard.php');
   exit;

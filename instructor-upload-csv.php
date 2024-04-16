@@ -5,11 +5,6 @@ include_once './_db.php';
 $activeStatus = ACTIVE;
 $getData = $db->getSingleRecord("SELECT c.*, ct.term_name FROM course as c INNER JOIN course_term as ct ON ct.id=c.term  WHERE c.status=$activeStatus ORDER BY c.created_dt DESC");
 
-if ($_SESSION['type'] != INSTRUCTOR) {
-    header('location:system-dashboard.php');
-    exit;
-}
-
 if (isset($_GET['type'])) {
     if ($_GET['type'] == 'delete') {
         $db->deleteData("TRUNCATE TABLE temp_users");
@@ -153,7 +148,7 @@ if (count($getData) === 0) :
     <div class="row">
         <div class="col-md-12">
             <div class="card">
-                <a href="./users.csv" class="btn btn-primary pull-right" download="">Download Sample</a>
+                <a href="./users.csv" class="btn btn-primary pull-right btn-sm" download="">Download Sample</a>
                 <legend><?= $pageName ?></legend>
 
                 <div class="row">
@@ -197,38 +192,41 @@ if (count($getData) === 0) :
                                 </div>
                                 <div class="form-group">
                                     <div class="col-lg-8 col-lg-offset-4">
-                                        <button class="btn btn-success" name="upload" type="submit">Upload</button>
-                                        <button class="btn btn-danger" type="reset">Cancel</button>
+                                        <button class="btn btn-success btn-sm" name="upload" type="submit">Upload</button>
+                                        <button class="btn btn-danger btn-sm" type="reset">Cancel</button>
                                     </div>
                                 </div>
                             </form>
                         </div>
 
                     </div>
-                    <div class="col-lg-12">
-                        <div class="pull-right">
-                            <a href="./instructor-upload-csv.php?type=submit" class="btn btn-success" onclick="return confirm('Are you sure you want to submit users ?')">Submit</a>
-                            <a href="./instructor-upload-csv.php?type=delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete uploaded data ?')">Delete All</a>
-                        </div>
-                        <legend>Uploaded Users</legend>
-                        <table class="table table-hover table-bordered" id="sampleTable">
-                            <thead>
-                                <tr>
-                                    <th>Sri No</th>
-                                    <th>Student Id</th>
-                                    <th>Last Name</th>
-                                    <th>First Name</th>
-                                    <th>Email Id</th>
+                    <?php
+                    $result = $db->getAllRecords("SELECT * FROM temp_users ORDER BY user_id ASC");
 
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $result = $db->getAllRecords("SELECT * FROM temp_users ORDER BY user_id ASC");
+                    if (count($result) > 0) :
+                    ?>
+                        <div class="col-lg-12">
+                            <div class="pull-right">
+                                <a href="./instructor-upload-csv.php?type=submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to submit users ?')">Submit</a>
+                                <a href="./instructor-upload-csv.php?type=delete" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete uploaded data ?')">Delete All</a>
+                            </div>
+                            <legend>Uploaded Users</legend>
+                            <table class="table table-hover table-bordered" id="sampleTable">
+                                <thead>
+                                    <tr>
+                                        <th>Sri No</th>
+                                        <th>Student Id</th>
+                                        <th>Last Name</th>
+                                        <th>First Name</th>
+                                        <th>Email Id</th>
 
-                                if (count($result) > 0) :
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+
                                     foreach ($result as $key => $value) :
-                                ?>
+                                    ?>
                                         <tr>
                                             <td><?= $key + 1 ?></td>
                                             <td><?= $value['student_id'] ?></td>
@@ -238,14 +236,11 @@ if (count($getData) === 0) :
                                         </tr>
                                     <?php
                                     endforeach;
-                                else : ?>
-                                    <tr>
-                                        <td colspan="8">No records found</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

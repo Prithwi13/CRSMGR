@@ -5,9 +5,9 @@ ob_start();
 // all User types
 define('ADMIN', 1);
 define('MARKER', 2);
-define("LABTUTOR", 3);
+define("TA_Lab_Tutor", 3);
 define('INSTRUCTOR', 4);
-define("INSTRUCTOR_LABTUTOR", 5);
+define("TA_Marker", 5);
 define("STUDENT", 6);
 define('ACTIVE', 1);
 define('INACTIVE', 0);
@@ -18,9 +18,12 @@ define('ADD_USERS', 'admin-add-users');
 define('ADD_COURSE', 'admin-add-course');
 define('INSTRUCTOR_UPLOAD_CSV', 'instructor-upload-csv');
 define('INSTRUCTOR_CURRENT_COURSE_STUDENTS', 'instructor-current-course-students');
+define('INSTRUCTOR_ADD_ASSIGNMENT', 'instructor-add-assignment');
+define('INSTRUCTOR_ADD_LECTURE_NOTES', 'instructor-add-lecture-notes');
 define('INSTRUCTOR_ADD_STUDENT_GROUPS', 'instructor-add-student-groups');
 define('SYSTEM_MESSAGE', 'system-message');
 define('SYSTEM_FAQ', 'system-faq');
+define('STUDENT_COURSE_GROUP', 'student-course-group');
 
 function getCurrentTime(): string
 {

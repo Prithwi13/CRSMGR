@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 04, 2024 at 09:12 PM
+-- Generation Time: Apr 07, 2024 at 09:54 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -34,6 +34,29 @@ CREATE TABLE `answers` (
   `question_id` int(11) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `modified_by` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `assignment`
+--
+
+CREATE TABLE `assignment` (
+  `id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `weight` float NOT NULL,
+  `max_marks` float NOT NULL,
+  `due_date` date NOT NULL,
+  `upload_file` varchar(150) NOT NULL,
+  `work_type` varchar(150) NOT NULL,
+  `peer_review` varchar(150) NOT NULL,
+  `status` int(11) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_dt` datetime NOT NULL,
+  `modified_by` int(11) DEFAULT NULL,
+  `modified_dt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -85,6 +108,38 @@ INSERT INTO `course_term` (`id`, `term_name`) VALUES
 (1, 'Fall'),
 (2, 'Summer'),
 (3, 'Winter');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `group_assignment`
+--
+
+CREATE TABLE `group_assignment` (
+  `id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `upload_file` varchar(150) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `created_dt` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `group_leader`
+--
+
+CREATE TABLE `group_leader` (
+  `id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `group_selection` tinyint(4) NOT NULL DEFAULT 0,
+  `leader_selection` tinyint(4) NOT NULL DEFAULT 0,
+  `leader_count` int(11) NOT NULL DEFAULT 0,
+  `created_dt` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -181,6 +236,7 @@ CREATE TABLE `student_group` (
   `group_name` varchar(150) NOT NULL,
   `course_id` int(11) NOT NULL,
   `groups_limit` int(11) NOT NULL,
+  `total_count` int(11) NOT NULL DEFAULT 0,
   `status` int(11) NOT NULL,
   `created_by` int(11) NOT NULL,
   `created_dt` datetime NOT NULL
@@ -242,6 +298,12 @@ ALTER TABLE `answers`
   ADD KEY `question_id` (`question_id`);
 
 --
+-- Indexes for table `assignment`
+--
+ALTER TABLE `assignment`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `chat_rooms`
 --
 ALTER TABLE `chat_rooms`
@@ -257,6 +319,18 @@ ALTER TABLE `course`
 -- Indexes for table `course_term`
 --
 ALTER TABLE `course_term`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `group_assignment`
+--
+ALTER TABLE `group_assignment`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `group_leader`
+--
+ALTER TABLE `group_leader`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -322,6 +396,12 @@ ALTER TABLE `answers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `assignment`
+--
+ALTER TABLE `assignment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `chat_rooms`
 --
 ALTER TABLE `chat_rooms`
@@ -340,10 +420,22 @@ ALTER TABLE `course_term`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT for table `group_assignment`
+--
+ALTER TABLE `group_assignment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `group_leader`
+--
+ALTER TABLE `group_leader`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `lectures_notes`
 --
 ALTER TABLE `lectures_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -385,7 +477,7 @@ ALTER TABLE `temp_users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -3,66 +3,62 @@ require_once './include-header.php';
 include_once './_db.php';
 
 if ($_SESSION['type'] != ADMIN) {
-    header('location:system-dashboard.php');
+    redirect('system-dashboard.php');
 }
-
-if (isset($_GET['edit-id'])) {
-    $courseId = $_GET['edit-id'];
-    $courseData = $db->getSingleRecord("SELECT term, course_name, start_date, end_date FROM course where course_id=$courseId");
-    $term = $courseData['term'];
-    $courseName = $courseData['course_name'];
-    $startDate = $courseData['start_date'];
-    $endDate = $courseData['end_date'];
-} else if (isset($_GET['active-course-id'])) {
-    $courseId = $_GET['active-course-id'];
-    $currentTime = getCurrentTime();
-    $db->updateData("UPDATE course SET status=0");
-    $check = $db->updateData("UPDATE course SET status=1, modified_dt = '$currentTime' WHERE course_id=$courseId");
-    if ($check) {
-        header('location:admin-add-course.php?status=success&message=' . urlencode('Course status updated successfully'));
-    } else {
-        header('location:admin-add-course.php?status=danger&message=' . urlencode('Database Problem'));
-    }
-}
-
-if (isset($_POST['create'])) {
+if (isset($_POST['update'])) {
+    $userEditId = base64_decode($_POST['updateId']);
     $term = $_POST['term'];
-    $courseName = $_POST['courseName'];
-    $startDate = $_POST['startDate'];
-    $endDate = $_POST['endDate'];
-    $status = 0;
-    $currentTime = getCurrentTime();
-
-    $result = $db->getSingleRecord("SELECT course_name FROM course where course_name='$courseName' and start_date='$startDate' and end_date='$endDate'");
-
-    if (count($result) === 0) {
-        $check = $db->insertData("INSERT INTO course VALUES (null,'$term','$courseName',$status,'$startDate','$endDate','$currentTime',null)");
-
-        if ($check > 0) {
-            header('location:admin-add-course.php?status=success&message=' . urlencode('Course created successfully & You have to active it first.'));
-        } else {
-            header('location:admin-add-course.php?status=danger&message=' . urlencode('Database Problem'));
-        }
-    } else {
-        header('location:admin-add-course.php?status=danger&message=' . urlencode('Course already exist'));
-    }
-} else if (isset($_POST['update'])) {
-    $userEditId = $_POST['updateId'];
-    $term = $_POST['term'];
-    $courseName = $_POST['courseName'];
+    $courseName = htmlentities($_POST['courseName']);
     $startDate = $_POST['startDate'];
     $endDate = $_POST['endDate'];
     $currentTime = getCurrentTime();
     $check = $db->updateData("UPDATE course SET term = '$term', course_name = '$courseName', start_date = '$startDate', end_date = '$endDate', modified_dt = '$currentTime' WHERE course_id = $userEditId");
 
     if ($check) {
-        header('location:admin-add-course.php?status=success&message=' . urlencode('Course updated successfully'));
+        redirect('admin-add-course.php?status=success&message=' . urlencode('Course updated successfully'));
     } else {
-        header('location:admin-add-course.php?status=danger&message=' . urlencode('Database Problem'));
+        redirect('admin-add-course.php?status=danger&message=' . urlencode('Database Problem'));
+    }
+} elseif (isset($_GET['edit-id'])) {
+    $courseId = base64_decode($_GET['edit-id']);
+    $courseData = $db->getSingleRecord("SELECT term, course_name, start_date, end_date FROM course where course_id=$courseId");
+    $term = $courseData['term'];
+    $courseName = $courseData['course_name'];
+    $startDate = $courseData['start_date'];
+    $endDate = $courseData['end_date'];
+} elseif (isset($_GET['active-course-id'])) {
+    $courseId = base64_decode($_GET['active-course-id']);
+    $currentTime = getCurrentTime();
+    $activeStatus = ACTIVE;
+    $inactive = INACTIVE;;
+    $db->updateData("UPDATE course SET status=$inactive");
+    $check = $db->updateData("UPDATE course SET status=$activeStatus, modified_dt = '$currentTime' WHERE course_id=$courseId");
+    if ($check) {
+        redirect('admin-add-course.php', 'status=success&message=' . urlencode('Course status updated successfully'));
+    } else {
+        redirect('admin-add-course.php', 'status=danger&message=' . urlencode('Database Problem'));
+    }
+} elseif (isset($_POST['create'])) {
+    $term = $_POST['term'];
+    $courseName = htmlentities($_POST['courseName']);
+    $startDate = $_POST['startDate'];
+    $endDate = $_POST['endDate'];
+    $status = INACTIVE;
+    $currentTime = getCurrentTime();
+    $result = $db->getSingleRecord("SELECT course_name FROM course where course_name='$courseName' and start_date='$startDate' and end_date='$endDate'");
+
+    if (count($result) === 0) {
+        $check = $db->insertData("INSERT INTO course VALUES (null,'$term','$courseName',$status,'$startDate','$endDate','$currentTime',null)");
+        if ($check) {
+            redirect('admin-add-course.php', 'status=success&message=' . urlencode('Course created successfully & You have to active it first.'));
+        } else {
+            redirect('admin-add-course.php', 'status=danger&message=' . urlencode('Database Problem'));
+        }
+    } else {
+        redirect('admin-add-course.php', 'status=danger&message=' . urlencode('Course already exist'));
     }
 }
-
-$pageName = breadCrumbs('Add Course');
+$pageName = breadCrumbs('Add Course', '<i class="fa fa-book" aria-hidden="true"></i>');
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -109,13 +105,13 @@ $pageName = breadCrumbs('Add Course');
                             <div class="form-group">
                                 <div class="col-lg-8 col-lg-offset-4">
                                     <?php if (isset($courseId)) : ?>
-                                        <input type="hidden" name="updateId" value="<?= $courseId ?>">
+                                        <input type="hidden" name="updateId" value="<?= base64_encode($courseId); ?>">
                                         <button class="btn btn-success" name="update" type="submit">Update</button>
                                     <?php else : ?>
                                         <button class="btn btn-success" name="create" type="submit">Create</button>
+                                        <button class="btn btn-danger" type="reset">Cancel</button>
                                     <?php endif; ?>
 
-                                    <button class="btn btn-danger" type="reset">Cancel</button>
                                 </div>
                             </div>
                         </form>
@@ -153,8 +149,8 @@ $pageName = breadCrumbs('Add Course');
                                         <td><?= $value['created_dt'] ?></td>
                                         <td><?= $value['modified_dt'] ?? 'N/A'; ?></td>
                                         <td>
-                                            <a class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to edit <?= $value['course_name'] ?> course ?')" href="admin-add-course.php?edit-id=<?= $value['course_id'] ?>">Edit</a>
-                                            <a class="btn btn-info btn-sm" onclick="return confirm('Are you sure you want to <?= $value['status'] ?  'inactive' : 'active' ?> <?= $value['course_name'] ?> course ?')" href='admin-add-course.php?active-course-id=<?= $value['course_id']; ?>'><?= $value['status'] ? 'Inactive' : 'Active' ?></a>
+                                            <a class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to edit <?= $value['course_name'] ?> course ?')" href="admin-add-course.php?edit-id=<?= base64_encode($value['course_id']) ?>">Edit</a>
+                                            <a class="btn btn-info btn-sm" onclick="return confirm('Are you sure you want to <?= $value['status'] ?  'inactive' : 'active' ?> <?= $value['course_name'] ?> course ?')" href='admin-add-course.php?active-course-id=<?= base64_encode($value['course_id']); ?>'><?= $value['status'] ? 'Inactive' : 'Active' ?></a>
                                         </td>
                                     </tr>
                                 <?php

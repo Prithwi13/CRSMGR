@@ -20,7 +20,6 @@ function breadCrumbs($pageName = 'Dashboard', $icon = '<i class="fa fa-dashboard
     return $pageName;
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 
@@ -79,7 +78,6 @@ function breadCrumbs($pageName = 'Dashboard', $icon = '<i class="fa fa-dashboard
                 <ul class="sidebar-menu">
                     <li <?= getLinkActiveClass(DASHBOARD) ?>><a href="system-dashboard.php"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>
 
-
                     <?php if ($_SESSION['type'] == ADMIN) : ?>
                         <!-- Admin Pages -->
                         <li <?= getLinkActiveClass(ADD_USERS) ?>><a href="admin-add-users.php"><i class="fa fa-user-o" aria-hidden="true"></i><span>Add Users</span></a></li>
@@ -91,8 +89,8 @@ function breadCrumbs($pageName = 'Dashboard', $icon = '<i class="fa fa-dashboard
                         <!-- Instructor Pages -->
                         <li <?= getLinkActiveClass(INSTRUCTOR_UPLOAD_CSV); ?>><a href="instructor-upload-csv.php"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Upload CSV</span></a></li>
                         <li <?= getLinkActiveClass(INSTRUCTOR_CURRENT_COURSE_STUDENTS) ?>><a href="instructor-current-course-students.php"><i class="fa fa-address-card" aria-hidden="true"></i><span>All Students</span></a></li>
-                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_STUDENT_GROUPS) ?>><a href="instructor-add-assignment.php"><i class="fa fa-file" aria-hidden="true"></i><span>Add Assignment</span></a></li>
-                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_STUDENT_GROUPS) ?>><a href="instructor-add-lecture-notes.php"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Add Lecture Notes</span></a></li>
+                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_ASSIGNMENT) ?>><a href="instructor-add-assignment.php"><i class="fa fa-file" aria-hidden="true"></i><span>Add Assignment</span></a></li>
+                        <li <?= getLinkActiveClass(INSTRUCTOR_ADD_LECTURE_NOTES) ?>><a href="instructor-add-lecture-notes.php"><i class="fa fa-file-text-o" aria-hidden="true"></i><span>Add Lecture Notes</span></a></li>
                         <li <?= getLinkActiveClass(INSTRUCTOR_ADD_STUDENT_GROUPS) ?>><a href="instructor-add-student-groups.php"><i class="fa fa-users" aria-hidden="true"></i><span>Create Student Groups</span></a></li>
                         <!-- End of Instructor Pages -->
                     <?php endif; ?>
@@ -103,9 +101,13 @@ function breadCrumbs($pageName = 'Dashboard', $icon = '<i class="fa fa-dashboard
                         <!-- End of common Pages but not for admin -->
                     <?php endif; ?>
 
-                    <!-- Common Pages for all users -->
+                    <?php if ((int)$_SESSION['type'] === STUDENT) : ?>
+                        <!-- Start of Student Pages -->
+                        <li <?= getLinkActiveClass(STUDENT_COURSE_GROUP) ?>><a href="student-course-group.php"><i class="fa fa-users" aria-hidden="true"></i><span>Course Group</span></a></li>
+                        <!-- End of Student Pages -->
+                    <?php endif; ?>
+
                     <li <?= getLinkActiveClass(SYSTEM_FAQ) ?>><a href="system-faq.php"><i class="fa fa-list-alt" aria-hidden="true"></i><span>FAQ</span></a></li>
-                    <!-- End common Pages for all users -->
                 </ul>
             </section>
         </aside>
