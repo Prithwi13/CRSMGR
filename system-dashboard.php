@@ -199,7 +199,7 @@ $pageName = breadCrumbs('Dashboard', '<i class="fa fa-dashboard"></i>');
   </div>
 
   <?php
-elseif ((int) $_SESSION['type'] == TA_Marker) :
+elseif ((int) $_SESSION['type'] == MARKER) :
   $status = ACTIVE;
   $result = $db->getAllRecords("SELECT sg.group_name,u.first_name, u.last_name,g.upload_file, g.created_dt FROM group_assignment as g INNER JOIN users as u ON u.user_id=g.student_id INNER JOIN student_group as sg ON sg.id=g.group_id INNER JOIN course as c ON c.course_id=g.course_id WHERE c.status=$status ORDER BY g.created_dt ASC");
   if (count($result) > 0) :
@@ -239,7 +239,7 @@ elseif ((int) $_SESSION['type'] == TA_Marker) :
     </div>
   <?php
   endif;
-elseif ((int) $_SESSION['type'] == TA_Lab_Tutor) :
+elseif ((int) $_SESSION['type'] == TA_Lab_Tutor || (int) $_SESSION['type'] == TA_Marker) :
   $active = ACTIVE;
   $courseId = $db->getSingleRecord("SELECT * FROM course WHERE status=$active");
   $courseId = $courseId['course_id'];
@@ -356,6 +356,40 @@ elseif ((int) $_SESSION['type'] == TA_Lab_Tutor) :
               <?php endif; ?>
             </tbody>
           </table>
+
+          <?php if ((int) $_SESSION['type'] === TA_Marker) :
+            $status = ACTIVE;
+            $result = $db->getAllRecords("SELECT sg.group_name,u.first_name, u.last_name,g.upload_file, g.created_dt FROM group_assignment as g INNER JOIN users as u ON u.user_id=g.student_id INNER JOIN student_group as sg ON sg.id=g.group_id INNER JOIN course as c ON c.course_id=g.course_id WHERE c.status=$status ORDER BY g.created_dt ASC");
+          ?>
+            <legend>Submitted Assignment</legend>
+            <table class="table table-hover table-bordered" id="sampleTable">
+              <thead>
+                <tr>
+                  <th>Sri No</th>
+                  <th>leader Name</th>
+                  <th>Group Name</th>
+                  <th>File Name</th>
+                  <th>Created Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php
+                foreach ($result as $key => $value) :
+                ?>
+                  <tr>
+                    <td><?= $key + 1 ?></td>
+                    <td><?= $value['last_name'] ?> <?= $value['first_name'] ?></td>
+                    <td><?= $value['group_name'] ?></td>
+                    <td><a href="./uploads/leader-assignment/<?= $value['upload_file'] ?>" target="_blank"><i class="fa fa-file" aria-hidden="true"></i> <?= $value['upload_file'] ?></a></td>
+                    <td><?= $value['created_dt'] ?></td>
+                  </tr>
+                <?php
+                endforeach;
+                ?>
+              </tbody>
+            </table>
+          <?php endif; ?>
+
         </div>
       </div>
     </div>
